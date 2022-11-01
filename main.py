@@ -8,7 +8,7 @@
 
 
 import numpy as np
-
+from scipy.fft import fft, fftfreq, ifft
 import matplotlib.pyplot as plt
 
 import astropy.units as u
@@ -44,15 +44,26 @@ def xyz(eph):
 tStart = Time('2010-03-20')
 tEnd = tStart + 10*u.yr
 t = np.linspace(tStart, tEnd, 200)
+t_mjd = t.to_value('mjd')
+print(t)
+print(t_mjd)
 
-fig1, ax1 = plt.subplots()
-fig2, ax2 = plt.subplots()
+
 bodies = ['moon', 'sun', 'mercury', 'venus', 'mars', 'jupiter', 'saturn']
 for b in bodies:
     eph = get_body(b, t)
     x,y,z = xyz(eph)
+    
+    
+    
     ax1.plot(x, y, label=b)
     ax2.plot(z, label=b)
+    ax3.plot(t_mjd, x)
+    xf = fft(x)
+    f = fftfreq(len(x), t_mjd[1]-t_mjd[0])
+    ax4.plot(f[f>0], abs(xf[f>0])**2)
+    print(f[np.argmax(abs(xf)**2)])
+    print(f[f>0.004][np.argmax(abs(xf[f>0.004])**2)])
 ax1.set_aspect('equal')
 ax1.legend()
 ax2.legend()
